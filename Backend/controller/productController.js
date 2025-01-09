@@ -11,17 +11,15 @@ export const addProduct = async (req, res) => {
             'category.description': categoryDescription,
         });
 
-        if (existingProduct) {
-            return res.status(400).json({ message: 'This product is already added. Please add another product.' });
-        }
+        // if (existingProduct) {
+        //     return res.status(400).json({ message: 'This product is already added. Please add another product.' });
+        // }
 
         // Upload image to Cloudinary if provided
-        let imageUrls = [];
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const result = await cloudinary.uploader.upload(file.path);
-                imageUrls.push(result.secure_url); // Add the uploaded image URL to the array
-            }
+        let imageUrl = [];
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            imageUrl.push(result.secure_url); // Store the image URL in the images array
         }
 
         // Create and save the product
@@ -31,7 +29,7 @@ export const addProduct = async (req, res) => {
                 name: categoryName,
                 description: categoryDescription,
             },
-            images: imageUrls,
+            images: imageUrl,
         });
 
         await newProduct.save();
